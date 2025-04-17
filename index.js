@@ -112,6 +112,8 @@ app.post('/send', async (req, res) => {
       nonce,
       from: fromAddress
     }, process.env.PRIVATE_KEY);
+    
+    console.log(`[${request_id}] signedTx`, signedTx);
 
     const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
     console.log(`[${request_id}] receipt`, receipt);
