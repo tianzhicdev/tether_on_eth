@@ -10,8 +10,8 @@ app.use(cors());
 // Add BigInt serialization support
 BigInt.prototype.toJSON = function() { return this.toString(); };
 
-// const web3 = new Web3(`https://mainnet.infura.io/v3/${process.env.INFURA_ID}`);
-const web3 = new Web3(`https://sepolia.infura.io/v3/${process.env.INFURA_ID}`);
+const domain = process.env.INFURA_DOMAIN;
+const web3 = new Web3(`https://${domain}/v3/${process.env.INFURA_ID}`);
 const usdtAbi = require('./erc20.abi.json');
 
 // USDT Contract (Mainnet)
@@ -89,12 +89,12 @@ app.post('/send', async (req, res) => {
     // Create account from private key first
     const account = web3.eth.accounts.privateKeyToAccount(process.env.PRIVATE_KEY);
     const fromAddress = account.address;
-    
-    // Use amount directly as wei (base unit)
+    console.log(`Transfer details - From: ${fromAddress}, To: ${to}, Amount: ${amount}`);
     const tx = usdtContract.methods.transfer(
       to, 
       amount.toString()
     );
+    console.log("tx", tx);
 
     const gas = await tx.estimateGas({ from: fromAddress });
     const gasPrice = await web3.eth.getGasPrice();

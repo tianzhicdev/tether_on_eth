@@ -5,4 +5,4 @@ services:
     ports:
       - "3100:3100"
     env_file:
-      - .env 
+      - /usr/local/.secrets.env

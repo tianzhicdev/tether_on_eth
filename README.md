@@ -22,6 +22,5 @@ A REST API service for Ethereum USDT token operations using Express.js and web3.
 security:
 we only deploy this localhost, we do not expose it to the public internet.
 next we need:
-
 1. whitelist the receiver address
- 
+
