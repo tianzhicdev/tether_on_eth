@@ -83,22 +83,26 @@ app.post('/receive', (req, res) => {
 
 // Send USDT
 app.post('/send', async (req, res) => {
+  const request_id = `req_${Math.random().toString(36).substring(2, 15)}${Date.now().toString(36)}`;
   const { to, amount } = req.body;
   
   try {
     // Create account from private key first
     const account = web3.eth.accounts.privateKeyToAccount(process.env.PRIVATE_KEY);
     const fromAddress = account.address;
-    console.log(`Transfer details - From: ${fromAddress}, To: ${to}, Amount: ${amount}`);
+    console.log(`[${request_id}] Transfer details - From: ${fromAddress}, To: ${to}, Amount: ${amount}`);
     const tx = usdtContract.methods.transfer(
       to, 
       amount.toString()
     );
-    console.log("tx", tx);
+    console.log(`[${request_id}] tx`, tx);
 
     const gas = await tx.estimateGas({ from: fromAddress });
     const gasPrice = await web3.eth.getGasPrice();
     const nonce = await web3.eth.getTransactionCount(fromAddress);
+    console.log(`[${request_id}] gas`, gas);
+    console.log(`[${request_id}] gasPrice`, gasPrice);
+    console.log(`[${request_id}] nonce`, nonce);
 
     const signedTx = await web3.eth.accounts.signTransaction({
       to: process.env.USDT_CONTRACT,
@@ -110,17 +114,20 @@ app.post('/send', async (req, res) => {
     }, process.env.PRIVATE_KEY);
 
     const receipt = await web3.eth.sendSignedTransaction(signedTx.rawTransaction);
+    console.log(`[${request_id}] receipt`, receipt);
     res.json({ 
       txHash: receipt.transactionHash,
       from: fromAddress,
       to: to,
-      amount: amount
+      amount: amount,
+      request_id: request_id
     });
   } catch (error) {
-    console.error('USDT Transfer Error:', error);
+    console.error(`[${request_id}] USDT Transfer Error:`, error);
     res.status(500).json({ 
       error: error.message,
-      stack: error.stack
+      stack: error.stack,
+      request_id: request_id
     });
   }
 });
